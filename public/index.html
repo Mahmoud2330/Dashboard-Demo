@@ -9,7 +9,7 @@
     <style>
         :root {
             --brand-black: #0a0a0a;
-            --brand-neon: #39ff14;
+            --brand-neon: #9b2ce0;
             --brand-dark: #1a1a1a;
             --brand-grey: #2a2a2a;
         }
@@ -316,34 +316,11 @@
 <body>
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <span class="navbar-brand">Neon Console</span>
-            <span class="navbar-text">Athlete Performance Dashboard</span>
+            <span class="navbar-text">Athlete Dashboard Demo</span>
         </div>
     </nav>
 
     <div class="container mt-4">
-        <!-- Stats Cards -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="stats-card">
-                    <div class="stats-number" id="totalAthletes">-</div>
-                    <div class="stats-label">Total Athletes</div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stats-card">
-                    <div class="stats-number" id="totalVideos">-</div>
-                    <div class="stats-label">Total Videos</div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stats-card">
-                    <div class="stats-number" id="totalMetrics">-</div>
-                    <div class="stats-label">Total Metrics</div>
-                </div>
-            </div>
-        </div>
-
         <!-- Dashboard Card -->
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -427,7 +404,6 @@
                 const response = await fetch('/api/dashboard');
                 const data = await response.json();
                 dashboardData = data;
-                updateStats(data);
                 populateFilters(data.allVideos);
                 displayVideos(data.allVideos);
             } catch (error) {
@@ -435,13 +411,6 @@
                 document.getElementById('videoCardsContainer').innerHTML = 
                     '<div class="text-center text-danger"><p>Error loading dashboard data</p></div>';
             }
-        }
-
-        // Update stats cards
-        function updateStats(data) {
-            document.getElementById('totalAthletes').textContent = data.totalAthletes;
-            document.getElementById('totalVideos').textContent = data.totalVideos;
-            document.getElementById('totalMetrics').textContent = data.totalMetrics;
         }
 
         // Populate filter options
@@ -487,7 +456,7 @@
                         <div class="video-preview-container">
                             ${video.status === 'COMPLETE' ? 
                                 `<video class="video-preview" controls preload="metadata">
-                                    <source src="/uploads/${video.filename}" type="video/mp4">
+                                    <source src="${video.filename.startsWith('http') ? video.filename : '/uploads/' + video.filename}" type="video/mp4">
                                     Your browser does not support the video tag.
                                 </video>` :
                                 `<div class="video-placeholder">
