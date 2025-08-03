@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athlete Performance Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --brand-black: #0a0a0a;
+            --brand-neon: #39ff14;
+            --brand-dark: #1a1a1a;
+            --brand-grey: #2a2a2a;
+        }
+
+        body {
+            background: var(--brand-black);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: var(--brand-dark) !important;
+            border-bottom: 2px solid var(--brand-neon);
+        }
+
+        .navbar-brand {
+            color: var(--brand-neon) !important;
+            font-weight: bold;
+        }
+
+        .card {
+            background: var(--brand-dark) !important;
+            border: 1px solid var(--brand-grey) !important;
+            border-radius: 8px;
+        }
+
+        .card-header {
+            background: var(--brand-grey) !important;
+            border-bottom: 1px solid var(--brand-neon) !important;
+            color: #fff !important;
+        }
+
+        .btn-brand {
+            background: var(--brand-neon) !important;
+            color: var(--brand-black) !important;
+            border: none !important;
+            font-weight: 600;
+        }
+
+        .btn-brand:hover {
+            background: #2dcc0f !important;
+            color: var(--brand-black) !important;
+        }
+
+        .btn-outline-brand {
+            color: var(--brand-neon) !important;
+            border-color: var(--brand-neon) !important;
+            background: transparent !important;
+        }
+
+        .btn-outline-brand:hover {
+            background: var(--brand-neon) !important;
+            color: var(--brand-black) !important;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-grey) 100%);
+            border: 1px solid var(--brand-neon);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--brand-neon);
+        }
+
+        .stats-label {
+            color: #ccc;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .video-cards-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 1rem;
+            padding: 1rem 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--brand-neon) var(--brand-dark);
+        }
+
+        .video-cards-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .video-cards-container::-webkit-scrollbar-track {
+            background: var(--brand-dark);
+            border-radius: 4px;
+        }
+
+        .video-cards-container::-webkit-scrollbar-thumb {
+            background: var(--brand-neon);
+            border-radius: 4px;
+        }
+
+        .video-card {
+            min-width: 280px;
+            max-width: 320px;
+            width: 300px;
+            flex-shrink: 0;
+            flex-grow: 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(57, 255, 20, 0.2) !important;
+        }
+
+        .video-preview-container {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            border-radius: 6px 6px 0 0;
+            flex-shrink: 0;
+        }
+
+        .video-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: var(--brand-black);
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .video-preview:hover {
+            transform: scale(1.02);
+        }
+
+        .video-preview::-webkit-media-controls {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .video-preview::-webkit-media-controls-panel {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .video-placeholder {
+            width: 100%;
+            height: 100%;
+            background: var(--brand-black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--brand-neon);
+            flex-shrink: 0;
+        }
+
+        .placeholder-content {
+            text-align: center;
+        }
+
+        .placeholder-content i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .placeholder-content p {
+            margin: 0;
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            z-index: 10;
+        }
+
+        .video-details {
+            font-size: 0.75rem;
+            color: #ccc;
+            margin-top: 0.5rem;
+            flex-grow: 1;
+        }
+
+        .detail-item {
+            margin-bottom: 0.25rem;
+            display: flex;
+            justify-content: space-between;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .detail-item strong {
+            color: var(--brand-neon);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .detail-item span {
+            color: #fff;
+            flex-grow: 1;
+            text-align: right;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .filter-section {
+            background: var(--brand-grey);
+            border: 1px solid var(--brand-neon);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-input {
+            background: var(--brand-black) !important;
+            color: #ffffff !important;
+            border: 1.5px solid var(--brand-neon) !important;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.375rem 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #fff !important;
+            box-shadow: 0 0 0 0.2rem rgba(57, 255, 20, 0.25) !important;
+            color: #ffffff !important;
+        }
+
+        .filter-input::placeholder {
+            color: #e0e0e0;
+            opacity: 0.9;
+        }
+
+        .filter-input[type="number"] {
+            color: #ffffff !important;
+        }
+
+        .filter-input[type="number"]::-webkit-inner-spin-button,
+        .filter-input[type="number"]::-webkit-outer-spin-button {
+            opacity: 1;
+            background: var(--brand-neon);
+        }
+
+        .filter-dropdown {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2339ff14' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 0.75rem center !important;
+            background-size: 16px 12px !important;
+            padding-right: 2.5rem !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+        }
+
+        .form-label {
+            color: var(--brand-neon);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .badge.bg-success {
+            background-color: var(--brand-neon) !important;
+            color: var(--brand-black) !important;
+        }
+
+        .badge.bg-warning {
+            background-color: #ffc107 !important;
+            color: var(--brand-black) !important;
+        }
+
+        .badge.bg-danger {
+            background-color: #dc3545 !important;
+            color: #fff !important;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <span class="navbar-brand">Neon Console</span>
+            <span class="navbar-text">Athlete Performance Dashboard</span>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalAthletes">-</div>
+                    <div class="stats-label">Total Athletes</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalVideos">-</div>
+                    <div class="stats-label">Total Videos</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalMetrics">-</div>
+                    <div class="stats-label">Total Metrics</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Card -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Athlete's Recent Physical Videos</span>
+                <button class="btn btn-outline-brand btn-sm" onclick="clearFilters()">Clear Filters</button>
+            </div>
+            <div class="card-body">
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label class="form-label">Year:</label>
+                            <select class="form-select filter-input filter-dropdown" id="yearFilter">
+                                <option value="all">All Years</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Month:</label>
+                            <select class="form-select filter-input filter-dropdown" id="monthFilter">
+                                <option value="all">All Months</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Week No.:</label>
+                            <select class="form-select filter-input filter-dropdown" id="weekFilter">
+                                <option value="all">All Weeks</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Duration from:</label>
+                            <div class="d-flex gap-2">
+                                <input type="number" class="form-control filter-input" id="durationFrom" placeholder="Min">
+                                <span class="align-self-center">to</span>
+                                <input type="number" class="form-control filter-input" id="durationTo" placeholder="Max">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Quick Sorting:</label>
+                            <select class="form-select filter-input filter-dropdown" id="quickSort">
+                                <option value="latest">Latest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="duration-high">Duration High</option>
+                                <option value="duration-low">Duration Low</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Activity Type:</label>
+                            <select class="form-select filter-input filter-dropdown" id="activityTypeFilter">
+                                <option value="all">All Activities</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Status:</label>
+                            <select class="form-select filter-input filter-dropdown" id="statusFilter">
+                                <option value="all">All Status</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Cards Container -->
+                <div id="videoCardsContainer">
+                    <div class="text-center text-muted">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+                        <p>Loading videos...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let dashboardData = null;
+
+        // Fetch dashboard data
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch('/api/dashboard');
+                const data = await response.json();
+                dashboardData = data;
+                updateStats(data);
+                populateFilters(data.allVideos);
+                displayVideos(data.allVideos);
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+                document.getElementById('videoCardsContainer').innerHTML = 
+                    '<div class="text-center text-danger"><p>Error loading dashboard data</p></div>';
+            }
+        }
+
+        // Update stats cards
+        function updateStats(data) {
+            document.getElementById('totalAthletes').textContent = data.totalAthletes;
+            document.getElementById('totalVideos').textContent = data.totalVideos;
+            document.getElementById('totalMetrics').textContent = data.totalMetrics;
+        }
+
+        // Populate filter options
+        function populateFilters(videos) {
+            const years = [...new Set(videos.map(v => v.year))].sort((a, b) => b - a);
+            const months = [...new Set(videos.map(v => v.month))].sort((a, b) => b - a);
+            const weeks = [...new Set(videos.map(v => v.weekNumber))].sort((a, b) => b - a);
+            const activityTypes = [...new Set(videos.map(v => v.activityType))].sort();
+            const statuses = [...new Set(videos.map(v => v.status))].sort();
+
+            populateSelect('yearFilter', years, 'All Years');
+            populateSelect('monthFilter', months, 'All Months');
+            populateSelect('weekFilter', weeks, 'All Weeks');
+            populateSelect('activityTypeFilter', activityTypes, 'All Activities');
+            populateSelect('statusFilter', statuses, 'All Status');
+        }
+
+        function populateSelect(selectId, options, defaultText) {
+            const select = document.getElementById(selectId);
+            const defaultOption = select.querySelector('option[value="all"]');
+            defaultOption.textContent = defaultText;
+            
+            options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option;
+                select.appendChild(optionElement);
+            });
+        }
+
+        // Display videos
+        function displayVideos(videos) {
+            const container = document.getElementById('videoCardsContainer');
+            
+            if (videos.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted"><p>No videos found matching the selected filters.</p></div>';
+                return;
+            }
+
+            const videoCards = videos.map(video => {
+                return video.athletes.map(athlete => `
+                    <div class="card video-card">
+                        <div class="video-preview-container">
+                            ${video.status === 'COMPLETE' ? 
+                                `<video class="video-preview" controls preload="metadata">
+                                    <source src="/uploads/${video.filename}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>` :
+                                `<div class="video-placeholder">
+                                    <div class="placeholder-content">
+                                        <i class="fas fa-video"></i>
+                                        <p>${video.status === 'PROCESSING' ? 'Processing...' : 'Failed'}</p>
+                                    </div>
+                                </div>`
+                            }
+                            <div class="status-badge">
+                                <span class="badge ${getStatusBadgeClass(video.status)}">${video.status}</span>
+                            </div>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title">${video.title}</h6>
+                            <div class="video-details">
+                                <div class="detail-item">
+                                    <strong>Athlete:</strong> <span>${athlete.name}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>Upload Date:</strong> <span>${new Date(video.createdAt).toLocaleDateString()}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>Duration:</strong> <span>${video.duration}s</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>Activity Type:</strong> <span>${video.activityType}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>Week:</strong> <span>${video.weekNumber}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }).join('');
+
+            container.innerHTML = `<div class="video-cards-container">${videoCards}</div>`;
+        }
+
+        // Get status badge class
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'COMPLETE': return 'bg-success';
+                case 'PROCESSING': return 'bg-warning';
+                case 'FAILED': return 'bg-danger';
+                default: return 'bg-secondary';
+            }
+        }
+
+        // Filter videos
+        function filterVideos() {
+            if (!dashboardData) return;
+
+            const yearFilter = document.getElementById('yearFilter').value;
+            const monthFilter = document.getElementById('monthFilter').value;
+            const weekFilter = document.getElementById('weekFilter').value;
+            const durationFrom = document.getElementById('durationFrom').value;
+            const durationTo = document.getElementById('durationTo').value;
+            const activityTypeFilter = document.getElementById('activityTypeFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const quickSort = document.getElementById('quickSort').value;
+
+            let filtered = dashboardData.allVideos.filter(video => {
+                const yearMatch = yearFilter === 'all' || video.year == yearFilter;
+                const monthMatch = monthFilter === 'all' || video.month == monthFilter;
+                const weekMatch = weekFilter === 'all' || video.weekNumber == weekFilter;
+                const activityMatch = activityTypeFilter === 'all' || video.activityType === activityTypeFilter;
+                const statusMatch = statusFilter === 'all' || video.status === statusFilter;
+                
+                let durationMatch = true;
+                if (durationFrom && video.duration < parseInt(durationFrom)) durationMatch = false;
+                if (durationTo && video.duration > parseInt(durationTo)) durationMatch = false;
+
+                return yearMatch && monthMatch && weekMatch && activityMatch && statusMatch && durationMatch;
+            });
+
+            // Sort videos
+            switch (quickSort) {
+                case 'latest':
+                    filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    break;
+                case 'oldest':
+                    filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                    break;
+                case 'duration-high':
+                    filtered.sort((a, b) => b.duration - a.duration);
+                    break;
+                case 'duration-low':
+                    filtered.sort((a, b) => a.duration - b.duration);
+                    break;
+            }
+
+            displayVideos(filtered);
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('yearFilter').value = 'all';
+            document.getElementById('monthFilter').value = 'all';
+            document.getElementById('weekFilter').value = 'all';
+            document.getElementById('durationFrom').value = '';
+            document.getElementById('durationTo').value = '';
+            document.getElementById('activityTypeFilter').value = 'all';
+            document.getElementById('statusFilter').value = 'all';
+            document.getElementById('quickSort').value = 'latest';
+            filterVideos();
+        }
+
+        // Add event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchDashboardData();
+            
+            // Add filter event listeners
+            document.getElementById('yearFilter').addEventListener('change', filterVideos);
+            document.getElementById('monthFilter').addEventListener('change', filterVideos);
+            document.getElementById('weekFilter').addEventListener('change', filterVideos);
+            document.getElementById('durationFrom').addEventListener('input', filterVideos);
+            document.getElementById('durationTo').addEventListener('input', filterVideos);
+            document.getElementById('activityTypeFilter').addEventListener('change', filterVideos);
+            document.getElementById('statusFilter').addEventListener('change', filterVideos);
+            document.getElementById('quickSort').addEventListener('change', filterVideos);
+        });
+    </script>
+</body>
+</html> 
